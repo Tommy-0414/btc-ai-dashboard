@@ -3,7 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BTC 智慧分析 DashBoard</title>
+  
+  <!-- 搜尋引擎顯示的網站標題 -->
+  <title>BTC 智慧分析儀表板 | AI 驅動即時比特幣行情與技術分析</title>
+  
+  <!-- 搜尋引擎摘要描述 (150字內精準說明) -->
+  <meta name="description" content="提供即時比特幣 (BTC) 價格數據與 Gemini AI 驅動的深度市場技術分析報告，包含多空評級、支撐壓力位與操作建議，每小時自動更新。">
+  
+  <!-- 搜尋關鍵字 (包含繁體中文與熱門搜尋詞) -->
+  <meta name="keywords" content="BTC, 比特幣, 比特幣價格, 加密貨幣, 比特幣行情, AI技術分析, Gemini AI, 比特幣多空分析, BTC走勢預測, 比特幣分析師, 加密貨幣儀表板">
+  <meta name="author" content="Tommy">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph 標籤 (讓 LINE, FB, Discord 分享時顯示漂亮預覽卡片) -->
+  <meta property="og:title" content="BTC 智慧分析儀表板 | AI 驅動即時行情簡報">
+  <meta property="og:description" content="即時 BTC 價格與 Gemini AI 深度技術分析，包含多空評級與關鍵支撐壓力位。">
+  <meta property="og:type" content="website">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
@@ -76,7 +92,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h3 style="font-weight: 800; letter-spacing: -0.5px;">BTC 智慧分析儀表板</h3>
+      <h1 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px;">BTC 智慧分析儀表板</h1>
       <span class="badge">Gemini 2.5 驅動</span>
     </div>
 
@@ -89,7 +105,7 @@
     <div id="time" class="footer"></div>
 
     <div class="disclaimer">
-      【免責聲明】本網站僅供個人學術研究與 AI 技術實驗使用，網頁顯示之所有數據與評估結果不構成任何形式之投資建議或決策依據。使用者應獨立思考，任何因參考本網站資訊所產生的盈虧由使用者自行承擔。
+      【免責聲明】本面板資料由 AI 自動產生，僅供個人研究與技術實驗使用，不構成任何形式之投資建議。
     </div>
   </div>
 
