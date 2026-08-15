@@ -3,29 +3,33 @@ import requests
 from google import genai
 from supabase import create_client, Client
 
-# 讀取環境變數（金鑰安全儲存於系統中）
+# 讀取環境變數
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-# 初始化 API 客戶端
+# 初始化客戶端
 ai_client = genai.Client(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_btc_data():
-    # 向 Binance API 抓取 24小時 BTC 價格與漲跌幅
-    url = "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
-    res = requests.get(url).json()
+    # 改用 CoinGecko API 抓取 BTC 價格與 24小時數據
+    url = "https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false"
+    headers = {"accept": "application/json"}
+    res = requests.get(url, headers=headers).json()
+    
+    market_data = res.get('market_data', {})
+    
     return {
-        "price": round(float(res['lastPrice']), 2),
-        "price_change": round(float(res['priceChangePercent']), 2),
-        "high": round(float(res['highPrice']), 2),
-        "low": round(float(res['lowPrice']), 2)
+        "price": round(float(market_data['current_price']['usd']), 2),
+        "price_change": round(float(market_data['price_change_percentage_24h']), 2),
+        "high": round(float(market_data['high_24h']['usd']), 2),
+        "low": round(float(market_data['low_24h']['usd']), 2)
     }
 
 def analyze_with_ai(data):
     prompt = f"""
-    你是一名客觀的加密貨幣市場分析師。根據以下即時數據進行簡短分析：
+    你是一名客觀的加密貨幣市場分析師。請根據以下即時數據進行簡短分析：
     - 比特幣 (BTC) 當前價格：${data['price']}
     - 24小時漲跌幅：{data['price_change']}%
     - 24小時最高價：${data['high']}
@@ -46,6 +50,7 @@ def analyze_with_ai(data):
 if __name__ == "__main__":
     print("開始抓取 BTC 數據...")
     btc_data = get_btc_data()
+    print(f"抓取成功！當前價格: ${btc_data['price']}")
     
     print("呼叫 Gemini AI 進行分析...")
     analysis_result = analyze_with_ai(btc_data)
