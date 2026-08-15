@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTC 智慧分析 DashBoard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; max-width: 600px; margin: auto; }
+    .card { background: #1e293b; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-top: 20px; }
+    .price { font-size: 2.2rem; font-weight: bold; color: #38bdf8; margin: 10px 0; }
+    .summary { white-space: pre-wrap; font-size: 1rem; line-height: 1.6; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
+    .time { font-size: 0.8rem; color: #94a3b8; margin-top: 15px; text-align: right; }
+    .disclaimer { font-size: 0.75rem; color: #64748b; margin-top: 30px; border-top: 1px solid #334155; padding-top: 12px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <h2>BTC 分析面板</h2>
+  
+  <div class="card">
+    <div>當前 BTC 即時價格 (USDT)</div>
+    <div id="price" class="price">載入中...</div>
+    
+    <div>AI 綜合分析報告：</div>
+    <div id="summary" class="summary">資料載入中，請稍候...</div>
+    
+    <div id="time" class="time"></div>
+  </div>
+
+  <div class="disclaimer">
+    【免責聲明】本網站僅供個人學術研究與 AI 技術實驗使用，網頁顯示之所有數據與評估結果不構成任何形式之投資建議或決策依據。使用者應獨立思考，任何因參考本網站資訊所產生的盈虧由使用者自行承擔。
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://njeyqainazpzplpmvtnh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qZXlxYWluYXpwenBscG12dG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTk2NDgsImV4cCI6MjEwMjM3NTY0OH0.S5pz_jwxpLVI7o95hZK4o9lEZ1eAm1O7ejdr1giU1Xs';
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function fetchLatestAnalysis() {
+      const { data, error } = await supabaseClient
+        .from('btc_analysis')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        document.getElementById('summary').innerText = '載入失敗：' + error.message;
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const result = data[0];
+        document.getElementById('price').innerText = '$' + Number(result.price).toLocaleString();
+        document.getElementById('summary').innerText = result.summary;
+        
+        const date = new Date(result.created_at);
+        document.getElementById('time').innerText = '最後更新時間：' + date.toLocaleString('zh-TW');
+      } else {
+        document.getElementById('summary').innerText = '目前尚無分析紀錄。';
+      }
+    }
+
+    fetchLatestAnalysis();
+  </script>
+</body>
+</html>
