@@ -11,7 +11,6 @@ ai_client = genai.Client(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_btc_data():
-    # 改用帶有時間戳記防快取的即時 API 請求
     url = "https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false"
     headers = {"accept": "application/json", "Cache-Control": "no-cache"}
     res = requests.get(url, headers=headers).json()
@@ -29,24 +28,29 @@ def get_btc_data():
 
 def analyze_with_ai(data):
     prompt = f"""
-    你是一名客觀的比特幣量化交易分析師，請根據以下即時數據進行技術分析：
+    你是一名高階加密貨幣量化交易分析師。請根據以下即時數據進行深度且詳盡的市場技術分析報告：
     - 即時價格：${data['price']} USDT
     - 24H 漲跌幅：{data['price_change']}%
     - 24H 最高價：${data['high']} USDT
     - 24H 最低價：${data['low']} USDT
+    - 歷史最高價 (ATH)：${data['ath']} USDT
     - 24H 總交易量：${data['volume']:,} USDT
 
-    請嚴格依照以下格式輸出（務必給出明確的多空方向）：
+    請嚴格依照以下結構輸出詳細報告（提供充實的內容與專業說明）：
 
-    【多空方向評級】[強勢看多 / 偏多看待 / 盤整觀望 / 偏空看待 / 強勢看空]
-    【短線操作建議】[建議逢低做多 / 建議逢高做空 / 建議暫時觀望]
+    【多空方向評級】
+    - 市場趨勢：[強勢看多 / 偏多看待 / 盤整觀望 / 偏空看待 / 強勢看空]
+    - 短線策略：[建議逢低佈局 / 建議逢高減碼 / 建議觀望等待突破]
 
     【關鍵價位分析】
-    - 上方阻力位：估算價格
-    - 下方支撐位：估算價格
+    - 上方強阻力位：估算價格與說明
+    - 下方強支撐位：估算價格與說明
 
-    【深度行情說明】
-    (用 2-3 句話簡短說明當前動能與多空對決情況)
+    【深度行情與技術解讀】
+    請詳細分析當前價格在 24H 波動區間內的位置、多空雙方力量拉鋸情形，以及交易量對當前趨勢的佐證程度（約 150-200 字）。
+
+    【操作建議與風險提示】
+    提供針對短期交易者與中長期持有者具體的入場思維、注意事項及嚴格的停損概念（約 100 字）。
     """
     
     response = ai_client.models.generate_content(
@@ -64,4 +68,4 @@ if __name__ == "__main__":
         "summary": analysis_result,
         "raw_data": btc_data
     }).execute()
-    print(f"最新價格 ${btc_data['price']} 與分析結果已成功寫入資料庫！")
+    print(f"最新價格 ${btc_data['price']} 與詳細分析已寫入 Supabase！")
