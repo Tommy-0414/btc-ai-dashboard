@@ -3,17 +3,14 @@ import requests
 from google import genai
 from supabase import create_client, Client
 
-# 讀取環境變數
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-# 初始化客戶端
 ai_client = genai.Client(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_btc_data():
-    # 改用 CoinGecko API 抓取 BTC 價格與 24小時數據
     url = "https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false"
     headers = {"accept": "application/json"}
     res = requests.get(url, headers=headers).json()
@@ -24,21 +21,35 @@ def get_btc_data():
         "price": round(float(market_data['current_price']['usd']), 2),
         "price_change": round(float(market_data['price_change_percentage_24h']), 2),
         "high": round(float(market_data['high_24h']['usd']), 2),
-        "low": round(float(market_data['low_24h']['usd']), 2)
+        "low": round(float(market_data['low_24h']['usd']), 2),
+        "ath": round(float(market_data['ath']['usd']), 2),
+        "volume": round(float(market_data['total_volume']['usd']), 2)
     }
 
 def analyze_with_ai(data):
     prompt = f"""
-    你是一名客觀的加密貨幣市場分析師。請根據以下即時數據進行簡短分析：
-    - 比特幣 (BTC) 當前價格：${data['price']}
-    - 24小時漲跌幅：{data['price_change']}%
-    - 24小時最高價：${data['high']}
-    - 24小時最低價：${data['low']}
+    你是一名高階加密貨幣量化分析師，請針對以下比特幣 (BTC) 即時行情數據進行專業且深入的市場簡報：
+    - 即時價格：${data['price']} USDT
+    - 24H 漲跌幅：{data['price_change']}%
+    - 24H 最高價：${data['high']} USDT
+    - 24H 最低價：${data['low']} USDT
+    - 歷史最高價 (ATH)：${data['ath']} USDT
+    - 24H 總交易量：${data['volume']:,} USDT
 
-    請輸出格式如下（請保持簡短，不要有額外開場白）：
-    【市場趨勢】[看多 / 看空 / 觀望]
-    【市場分析】兩句簡短客觀的行情說明。
-    【風險提示】一句提醒觀測關鍵價位的警示。
+    請嚴格依照以下格式輸出報告（使用清晰標題與重點條列，字數約 200-300 字）：
+
+    【市場定調與態勢】
+    (說明目前市場屬於強勢多頭、震盪整理還是空頭修正，並給出建議觀望或佈局之看法)
+
+    【關鍵價位分析】
+    - 上方壓力位：估計區間
+    - 下方支撐位：估計區間
+
+    【深度行情解讀】
+    (結合 24H 振幅與交易量，分析資金動向與市場情緒)
+
+    【操作策略與風險提示】
+    (針對短期與中長期交易者提出客觀的操作建議與停損概念)
     """
     
     response = ai_client.models.generate_content(
@@ -48,18 +59,12 @@ def analyze_with_ai(data):
     return response.text
 
 if __name__ == "__main__":
-    print("開始抓取 BTC 數據...")
     btc_data = get_btc_data()
-    print(f"抓取成功！當前價格: ${btc_data['price']}")
-    
-    print("呼叫 Gemini AI 進行分析...")
     analysis_result = analyze_with_ai(btc_data)
     
-    print("將分析結果存入 Supabase...")
     supabase.table("btc_analysis").insert({
         "price": btc_data["price"],
         "summary": analysis_result,
         "raw_data": btc_data
     }).execute()
-    
-    print("成功！分析已完成並寫入資料庫！")
+    print("分析更新完成！")
