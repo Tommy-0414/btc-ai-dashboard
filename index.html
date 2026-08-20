@@ -33,7 +33,7 @@
       overflow-x: hidden;
     }
 
-    /* 1. 賽博龐克 3D 網格底盤 */
+    /* 1. 3D 網格（加入 GPU 渲染優化與 transform3d） */
     .cyber-grid {
       position: fixed;
       width: 200%;
@@ -41,51 +41,54 @@
       top: 40%;
       left: -50%;
       background-image: 
-        linear-gradient(to right, rgba(56, 189, 248, 0.15) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.15) 1px, transparent 1px);
-      background-size: 50px 50px;
-      transform: perspective(500px) rotateX(65deg);
-      animation: gridMove 8s linear infinite;
+        linear-gradient(to right, rgba(56, 189, 248, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.12) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(500px) rotateX(65deg) translateZ(0);
+      will-change: transform;
+      animation: gridMove 10s linear infinite;
       z-index: 0;
       mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 80%);
       -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 80%);
     }
 
     @keyframes gridMove {
-      0% { transform: perspective(500px) rotateX(65deg) translateY(0); }
-      100% { transform: perspective(500px) rotateX(65deg) translateY(50px); }
+      0% { transform: perspective(500px) rotateX(65deg) translateY(0) translateZ(0); }
+      100% { transform: perspective(500px) rotateX(65deg) translateY(60px) translateZ(0); }
     }
 
-    /* 2. 背景閃爍霓拿光暈 */
+    /* 2. 背景霓虹光暈（調降 blur 值降低顯卡負擔） */
     .bg-glow-1 {
       position: fixed;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(56, 189, 248, 0.1) 40%, rgba(0,0,0,0) 70%);
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(56, 189, 248, 0.08) 40%, rgba(0,0,0,0) 70%);
       top: -100px;
       right: -100px;
-      filter: blur(60px);
+      filter: blur(35px);
+      will-change: transform, opacity;
       animation: pulseGlow 6s ease-in-out infinite alternate;
       z-index: 0;
     }
     .bg-glow-2 {
       position: fixed;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(16, 185, 129, 0.1) 40%, rgba(0,0,0,0) 70%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(16, 185, 129, 0.08) 40%, rgba(0,0,0,0) 70%);
       bottom: -150px;
       left: -150px;
-      filter: blur(70px);
+      filter: blur(40px);
+      will-change: transform, opacity;
       animation: pulseGlow 8s ease-in-out infinite alternate-reverse;
       z-index: 0;
     }
 
     @keyframes pulseGlow {
-      0% { opacity: 0.5; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1.15); }
+      0% { opacity: 0.5; transform: scale(0.9) translateZ(0); }
+      100% { opacity: 1; transform: scale(1.1) translateZ(0); }
     }
 
-    /* 3. 漂浮 BTC 圖騰與金色粒子 */
+    /* 3. 漂浮 BTC 圖騰 */
     .btc-icon-bg {
       position: fixed;
       font-size: 15rem;
@@ -95,16 +98,16 @@
       left: 5%;
       user-select: none;
       z-index: 1;
-      filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.1));
+      will-change: transform;
       animation: floatBTC 12s ease-in-out infinite alternate;
     }
 
     @keyframes floatBTC {
-      0% { transform: translateY(0) rotate(-5deg); }
-      100% { transform: translateY(-40px) rotate(5deg); }
+      0% { transform: translateY(0) rotate(-5deg) translateZ(0); }
+      100% { transform: translateY(-30px) rotate(5deg) translateZ(0); }
     }
 
-    /* 4. 動態霓虹 K 線波浪 (高亮加粗) */
+    /* 4. 動態 K 線波浪 */
     .chart-bg {
       position: fixed;
       top: 0;
@@ -117,11 +120,12 @@
     .wave-line {
       fill: none;
       stroke: url(#neon-gradient);
-      stroke-width: 4;
-      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8));
+      stroke-width: 3.5;
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
       stroke-dasharray: 1200;
       stroke-dashoffset: 1200;
-      animation: dash 6s linear infinite;
+      will-change: stroke-dashoffset;
+      animation: dash 7s linear infinite;
     }
 
     @keyframes dash {
@@ -129,19 +133,19 @@
       100% { stroke-dashoffset: 0; }
     }
 
-    /* 5. 主卡片（調高透光度，讓背景光影穿透） */
+    /* 5. 主卡片（優化半透明 blur） */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
       max-width: 680px;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 24px;
       padding: 32px;
-      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
     }
 
     .header {
@@ -170,10 +174,9 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin: 5px 0 20px 0; 
-      filter: drop-shadow(0 2px 10px rgba(56, 189, 248, 0.2));
     }
     .report-box {
-      background: rgba(3, 7, 18, 0.7);
+      background: rgba(3, 7, 18, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 14px;
       padding: 22px;
@@ -189,7 +192,6 @@
       text-align: right;
     }
 
-    /* 醒目免責聲明 */
     .disclaimer-box {
       margin-top: 25px;
       padding: 16px;
@@ -199,7 +201,6 @@
       font-size: 0.75rem;
       color: #e5e7eb;
       line-height: 1.6;
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
     }
     .disclaimer-title {
       color: #f59e0b;
@@ -214,17 +215,13 @@
 </head>
 <body>
 
-  <!-- 3D 網格底盤 -->
   <div class="cyber-grid"></div>
 
-  <!-- 霓虹脈衝光暈 -->
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
 
-  <!-- 漂浮 BTC 水印圖騰 -->
   <div class="btc-icon-bg">₿</div>
 
-  <!-- 高光走勢線條 -->
   <svg class="chart-bg" preserveAspectRatio="none" viewBox="0 0 1200 600">
     <defs>
       <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
