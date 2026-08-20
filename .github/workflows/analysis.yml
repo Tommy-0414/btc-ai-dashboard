@@ -2,7 +2,7 @@ name: BTC Auto Analysis
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # 改為每 30 分鐘執行一次
+    - cron: '*/45 * * * *'
   workflow_dispatch: # 支援手動按鈕觸發
 
 jobs:
