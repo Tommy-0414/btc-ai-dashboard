@@ -5,20 +5,20 @@
   <meta name="google-site-verification" content="10h7ZCN-tTjjTxmx0T77ovc34P8kPWqy3uhLgT2ltwc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <!-- 搜尋引擎顯示的網站標題 -->
-  <title>BTC 智慧分析儀表板 | AI 驅動即時比特幣行情與技術分析</title>
+  <!-- 搜尋引擎顯示的網站標題 (鎖定走勢與分析關鍵字) -->
+  <title>比特幣走勢與即時價格分析 | BTC AI 技術預測儀表板</title>
   
-  <!-- 搜尋引擎摘要描述 (150字內精準說明) -->
-  <meta name="description" content="提供即時比特幣 (BTC) 價格數據與 Gemini AI 驅動的深度市場技術分析報告，包含多空評級、支撐壓力位與操作建議，每小時自動更新。">
+  <!-- 搜尋引擎摘要描述 (融入熱門搜尋情境) -->
+  <meta name="description" content="提供即時比特幣 (BTC) 走勢分析、價格數據與 Gemini AI 自動化深度市場技術分析報告，包含多空評級、關鍵支撐壓力位與短線操作建議。">
   
-  <!-- 搜尋關鍵字 (包含繁體中文與熱門搜尋詞) -->
-  <meta name="keywords" content="BTC, 比特幣, 比特幣價格, 加密貨幣, 比特幣行情, AI技術分析, Gemini AI, 比特幣多空分析, BTC走勢預測, 比特幣分析師, 加密貨幣儀表板">
+  <!-- 搜尋關鍵字 -->
+  <meta name="keywords" content="比特幣走勢, 比特幣分析, 比特幣今天價格, BTC即時行情, 加密貨幣, AI技術分析, Gemini AI, 比特幣多空預測, BTC走勢, 加密貨幣儀表板">
   <meta name="author" content="Tommy">
   <meta name="robots" content="index, follow">
 
-  <!-- Open Graph 標籤 (讓 LINE, FB, Discord 分享時顯示漂亮預覽卡片) -->
-  <meta property="og:title" content="BTC 智慧分析儀表板 | AI 驅動即時行情簡報">
-  <meta property="og:description" content="即時 BTC 價格與 Gemini AI 深度技術分析，包含多空評級與關鍵支撐壓力位。">
+  <!-- Open Graph 標籤 (社群分享預覽卡片) -->
+  <meta property="og:title" content="比特幣走勢與即時價格分析 | BTC AI 技術預測儀表板">
+  <meta property="og:description" content="即時 BTC 價格走勢與 Gemini AI 深度技術分析報告，包含多空評級與關鍵支撐壓力位。">
   <meta property="og:type" content="website">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -93,14 +93,15 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px;">BTC 智慧分析儀表板</h1>
+      <!-- 畫面主標題加入關鍵字：比特幣走勢與 AI 分析 -->
+      <h1 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px;">比特幣走勢與 AI 分析儀表板</h1>
       <span class="badge">Gemini 2.5 驅動</span>
     </div>
 
     <div class="price-label">即時比特幣價格 (USDT)</div>
     <div id="price" class="price-val">$--,---</div>
 
-    <div class="price-label" style="margin-bottom: 8px;">AI 深度分析簡報</div>
+    <div class="price-label" style="margin-bottom: 8px;">比特幣走勢與 AI 深度分析簡報</div>
     <div id="summary" class="report-box">資料讀取中，請稍候...</div>
 
     <div id="time" class="footer"></div>
