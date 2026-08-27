@@ -6,14 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>比特幣走勢與即時價格分析 | BTC AI 技術預測儀表板</title>
-  <meta name="description" content="提供即時比特幣 (BTC) 走勢分析、價格數據與 Gemini AI 自動化深度市場技術分析報告，包含多空評級、關鍵支撐壓力位與短線操作建議。">
-  <meta name="keywords" content="比特幣走勢, 比特幣分析, 比特幣今天價格, BTC即時行情, 加密貨幣, AI技術分析, Gemini AI, 比特幣多空預測, BTC走勢, 加密貨幣儀表板">
+  <meta name="description" content="提供即時比特幣 (BTC) 走勢分析、TradingView 技術指標與 Gemini AI 自動化深度市場報告。">
+  <meta name="keywords" content="比特幣走勢, 比特幣分析, 比特幣今天價格, BTC即時行情, 加密貨幣, AI技術分析, TradingView, BTC走勢">
   <meta name="author" content="Tommy">
   <meta name="robots" content="index, follow">
-
-  <meta property="og:title" content="比特幣走勢與即時價格分析 | BTC AI 技術預測儀表板">
-  <meta property="og:description" content="即時 BTC 價格走勢與 Gemini AI 深度技術分析報告，包含多空評級與關鍵支撐壓力位。">
-  <meta property="og:type" content="website">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -33,7 +29,7 @@
       overflow-x: hidden;
     }
 
-    /* 1. 3D 網格（加入 GPU 渲染優化與 transform3d） */
+    /* 賽博龐克背景 */
     .cyber-grid {
       position: fixed;
       width: 200%;
@@ -41,12 +37,12 @@
       top: 40%;
       left: -50%;
       background-image: 
-        linear-gradient(to right, rgba(56, 189, 248, 0.12) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.12) 1px, transparent 1px);
+        linear-gradient(to right, rgba(56, 189, 248, 0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 189, 248, 0.1) 1px, transparent 1px);
       background-size: 60px 60px;
       transform: perspective(500px) rotateX(65deg) translateZ(0);
       will-change: transform;
-      animation: gridMove 10s linear infinite;
+      animation: gridMove 12s linear infinite;
       z-index: 0;
       mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 80%);
       -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 80%);
@@ -57,95 +53,30 @@
       100% { transform: perspective(500px) rotateX(65deg) translateY(60px) translateZ(0); }
     }
 
-    /* 2. 背景霓虹光暈（調降 blur 值降低顯卡負擔） */
     .bg-glow-1 {
-      position: fixed;
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(56, 189, 248, 0.08) 40%, rgba(0,0,0,0) 70%);
-      top: -100px;
-      right: -100px;
-      filter: blur(35px);
-      will-change: transform, opacity;
-      animation: pulseGlow 6s ease-in-out infinite alternate;
-      z-index: 0;
-    }
-    .bg-glow-2 {
       position: fixed;
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(16, 185, 129, 0.08) 40%, rgba(0,0,0,0) 70%);
-      bottom: -150px;
-      left: -150px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(56, 189, 248, 0.05) 50%, rgba(0,0,0,0) 70%);
+      top: -100px; right: -100px;
       filter: blur(40px);
-      will-change: transform, opacity;
-      animation: pulseGlow 8s ease-in-out infinite alternate-reverse;
       z-index: 0;
     }
 
-    @keyframes pulseGlow {
-      0% { opacity: 0.5; transform: scale(0.9) translateZ(0); }
-      100% { opacity: 1; transform: scale(1.1) translateZ(0); }
-    }
-
-    /* 3. 漂浮 BTC 圖騰 */
-    .btc-icon-bg {
-      position: fixed;
-      font-size: 15rem;
-      font-weight: 800;
-      color: rgba(245, 158, 11, 0.04);
-      top: 10%;
-      left: 5%;
-      user-select: none;
-      z-index: 1;
-      will-change: transform;
-      animation: floatBTC 12s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatBTC {
-      0% { transform: translateY(0) rotate(-5deg) translateZ(0); }
-      100% { transform: translateY(-30px) rotate(5deg) translateZ(0); }
-    }
-
-    /* 4. 動態 K 線波浪 */
-    .chart-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
-    .wave-line {
-      fill: none;
-      stroke: url(#neon-gradient);
-      stroke-width: 3.5;
-      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
-      stroke-dasharray: 1200;
-      stroke-dashoffset: 1200;
-      will-change: stroke-dashoffset;
-      animation: dash 7s linear infinite;
-    }
-
-    @keyframes dash {
-      0% { stroke-dashoffset: 1200; }
-      100% { stroke-dashoffset: 0; }
-    }
-
-    /* 5. 主卡片（優化半透明 blur） */
+    /* 主卡片容器 */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 680px;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      max-width: 900px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
+      padding: 28px;
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+      margin: 20px 0;
     }
 
     .header {
@@ -164,27 +95,38 @@
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 600;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
     }
-    .price-label { font-size: 0.85rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
-    .price-val { 
-      font-size: 3.2rem; 
-      font-weight: 800; 
-      background: linear-gradient(to right, #ffffff, #38bdf8, #f59e0b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 5px 0 20px 0; 
+
+    /* TradingView 區塊 */
+    .widget-section {
+      margin-bottom: 24px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(3, 7, 18, 0.6);
     }
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 報告區塊 */
     .report-box {
       background: rgba(3, 7, 18, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 22px;
       font-size: 0.95rem;
-      line-height: 1.75;
+      line-height: 1.8;
       white-space: pre-wrap;
       color: #e5e7eb;
     }
+
     .footer {
       margin-top: 15px;
       font-size: 0.75rem;
@@ -196,64 +138,82 @@
       margin-top: 25px;
       padding: 16px;
       background: rgba(245, 158, 11, 0.1);
-      border: 1px solid rgba(245, 158, 11, 0.5);
+      border: 1px solid rgba(245, 158, 11, 0.4);
       border-radius: 12px;
       font-size: 0.75rem;
       color: #e5e7eb;
       line-height: 1.6;
-    }
-    .disclaimer-title {
-      color: #f59e0b;
-      font-weight: 700;
-      font-size: 0.82rem;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
   </style>
 </head>
 <body>
 
   <div class="cyber-grid"></div>
-
   <div class="bg-glow-1"></div>
-  <div class="bg-glow-2"></div>
-
-  <div class="btc-icon-bg">₿</div>
-
-  <svg class="chart-bg" preserveAspectRatio="none" viewBox="0 0 1200 600">
-    <defs>
-      <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.2" />
-        <stop offset="40%" stop-color="#38bdf8" stop-opacity="1" />
-        <stop offset="70%" stop-color="#10b981" stop-opacity="1" />
-        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.2" />
-      </linearGradient>
-    </defs>
-    <path class="wave-line" d="M -100,350 Q 200,100 450,300 T 900,150 T 1300,400" />
-    <path class="wave-line" d="M -100,200 Q 300,500 650,250 T 1100,350 T 1300,100" style="animation-duration: 9s; animation-delay: -2s; opacity: 0.6; stroke-width: 2;" />
-  </svg>
 
   <div class="container">
+    <!-- 頁頭 -->
     <div class="header">
-      <h1 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px;">比特幣走勢與 AI 分析儀表板</h1>
-      <span class="badge">Gemini 2.5 驅動</span>
+      <h1 style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;">比特幣走勢與 AI 智慧分析儀表板</h1>
+      <span class="badge">Gemini 2.5 + TradingView</span>
     </div>
 
-    <div class="price-label">即時比特幣價格 (USDT)</div>
-    <div id="price" class="price-val">$--,---</div>
+    <!-- 1. TradingView 即時走勢圖表 Widget -->
+    <div class="section-title">📈 即時市場 K 線行情</div>
+    <div class="widget-section" style="height: 380px;">
+      <div class="tradingview-widget-container" style="height:100%;width:100%">
+        <div id="tradingview_chart" style="height:calc(100% - 32px);width:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+          new TradingView.widget({
+            "autosize": true,
+            "symbol": "BITSTAMP:BTCUSD",
+            "interval": "60",
+            "timezone": "Asia/Taipei",
+            "theme": "dark",
+            "style": "1",
+            "locale": "zh_TW",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_top_toolbar": false,
+            "save_image": false,
+            "container_id": "tradingview_chart"
+          });
+        </script>
+      </div>
+    </div>
 
-    <div class="price-label" style="margin-bottom: 8px;">比特幣走勢與 AI 深度分析簡報</div>
+    <!-- 2. TradingView 多空指針儀表 Widget (你截圖中的功能) -->
+    <div class="section-title">⏱️ 即時技術指標與多空指針</div>
+    <div class="widget-section">
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+        {
+          "interval": "1D",
+          "width": "100%",
+          "isTransparent": true,
+          "height": "420",
+          "symbol": "BITSTAMP:BTCUSD",
+          "showIntervalTabs": true,
+          "displayMode": "single",
+          "locale": "zh_TW",
+          "colorTheme": "dark"
+        }
+        </script>
+      </div>
+    </div>
+
+    <!-- 3. Gemini AI 結構化深度報告 -->
+    <div class="section-title">🤖 Gemini AI 綜合評估與建議</div>
     <div id="summary" class="report-box">資料讀取中，請稍候...</div>
 
     <div id="time" class="footer"></div>
 
+    <!-- 免責聲明 -->
     <div class="disclaimer-box">
-      <div class="disclaimer-title">
-        ⚠️ 【重要免責聲明與風險警示】
-      </div>
-      本網站所提供之所有數據、圖表及 AI 技術分析報告，僅供個人學術研究與技術實驗參考，<strong>不構成任何形式之投資建議、財務諮詢或買賣招攬</strong>。加密貨幣市場具高風險性，價格波動劇烈，用戶應自行承擔所有投資風險與盈虧。本站不對任何因使用或參考本站內容而導致之直接或間接損失負任何法律責任。
+      <strong style="color: #f59e0b;">⚠️ 【免責聲明與風險警示】</strong><br>
+      本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。加密貨幣市場具高風險，請自行承擔投資風險。
     </div>
   </div>
 
@@ -277,11 +237,10 @@
 
       if (data && data.length > 0) {
         const result = data[0];
-        document.getElementById('price').innerText = '$' + Number(result.price).toLocaleString('en-US');
         document.getElementById('summary').innerText = result.summary;
         
         const date = new Date(result.created_at);
-        document.getElementById('time').innerText = '最後更新：' + date.toLocaleString('zh-TW');
+        document.getElementById('time').innerText = 'AI 報告更新時間：' + date.toLocaleString('zh-TW');
       }
     }
 
