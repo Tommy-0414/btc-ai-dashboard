@@ -29,7 +29,6 @@
       overflow-x: hidden;
     }
 
-    /* 賽博龐克背景 */
     .cyber-grid {
       position: fixed;
       width: 200%;
@@ -63,7 +62,6 @@
       z-index: 0;
     }
 
-    /* 主容器：針對手機做彈性調整 */
     .container {
       position: relative;
       z-index: 2;
@@ -127,11 +125,10 @@
       color: #38bdf8;
       margin-bottom: 10px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 6px;
     }
 
-    /* 指標中文說明對照卡片 */
     .indicator-legend {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -141,6 +138,20 @@
       font-size: 0.78rem;
       color: #9ca3af;
       line-height: 1.6;
+    }
+
+    .ai-info-banner {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid #38bdf8;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .report-box {
@@ -158,7 +169,8 @@
       margin-top: 12px;
       font-size: 0.72rem;
       color: #9ca3af;
-      text-align: right;
+      display: flex;
+      justify-content: space-between;
     }
 
     .disclaimer-box {
@@ -184,8 +196,10 @@
       <span class="badge">Gemini 2.5 + TradingView</span>
     </div>
 
-    <!-- 1. K線走勢圖 (手機高 300px，電腦高 380px) -->
-    <div class="section-title">📈 即時市場 K 線行情</div>
+    <!-- 1. K線走勢圖 -->
+    <div class="section-title">
+      <span>📈 即時市場 K 線行情 (秒級更新)</span>
+    </div>
     <div class="widget-section" style="height: 320px;">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div id="tradingview_chart" style="height:calc(100% - 32px);width:100%"></div>
@@ -210,7 +224,9 @@
     </div>
 
     <!-- 2. 多空指針 Widget -->
-    <div class="section-title">⏱️ 即時技術指標與多空指針</div>
+    <div class="section-title">
+      <span>⏱️ 技術指標與多空指針</span>
+    </div>
     <div class="widget-section">
       <div class="tradingview-widget-container">
         <div class="tradingview-widget-container__widget"></div>
@@ -233,16 +249,27 @@
     <!-- 中英文指標簡介小卡片 -->
     <div class="indicator-legend">
       <strong>💡 常用技術指標中英對照說明：</strong><br>
-      • <strong>RSI (Relative Strength Index / 相對強弱指標)</strong>：評估市場超買（>70）或超賣（<30）狀態。<br>
-      • <strong>MACD (Moving Average Convergence Divergence / 平滑異同移動平均線)</strong>：判斷動能與趨勢轉折。<br>
-      • <strong>EMA / SMA (Moving Averages / 移動平均線)</strong>：觀察短中長期價格平均支撐與壓力位。
+      • <strong>RSI (Relative Strength Index / 相對強弱指標)</strong>：評估超買（>70）或超賣（<30）。<br>
+      • <strong>MACD (Moving Average Convergence Divergence / 平滑異同移動平均線)</strong>：判斷趨勢轉折。<br>
+      • <strong>EMA / SMA (Moving Averages / 移動平均線)</strong>：觀察長短期平均支撐與壓力位。
     </div>
 
-    <!-- 3. Gemini AI 深度報告 -->
-    <div class="section-title">🤖 Gemini AI 綜合評估與建議</div>
+    <!-- 3. Gemini AI 深度報告 (含時間差說明 banner) -->
+    <div class="section-title">
+      <span>🤖 Gemini AI 週期性綜合評估</span>
+    </div>
+
+    <!-- 資訊提示橫幅 -->
+    <div class="ai-info-banner">
+      <span>ℹ️ 本報告由 AI 定期抓取市場數據生成，與上方秒級 K 線有微小時間差屬正常現象。</span>
+    </div>
+
     <div id="summary" class="report-box">資料讀取中，請稍候...</div>
 
-    <div id="time" class="footer"></div>
+    <div class="footer">
+      <span id="ai-status">⚡ 數據狀態：自動同步中</span>
+      <span id="time">更新時間載入中...</span>
+    </div>
 
     <div class="disclaimer-box">
       <strong style="color: #f59e0b;">⚠️ 【免責聲明與風險警示】</strong><br>
@@ -273,11 +300,14 @@
         document.getElementById('summary').innerText = result.summary;
         
         const date = new Date(result.created_at);
-        document.getElementById('time').innerText = 'AI 報告更新時間：' + date.toLocaleString('zh-TW');
+        document.getElementById('time').innerText = 'AI 報告上次生成時間：' + date.toLocaleString('zh-TW');
       }
     }
 
     fetchLatestAnalysis();
+
+    // 每 60 秒在背景自動重新檢查 Supabase 是否有最新 AI 報告
+    setInterval(fetchLatestAnalysis, 60000);
   </script>
 </body>
 </html>
