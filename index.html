@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="google-site-verification" content="10h7ZCN-tTjjTxmx0T77ovc34P8kPWqy3uhLgT2ltwc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
   <title>比特幣走勢與即時價格分析 | BTC AI 技術預測儀表板</title>
   <meta name="description" content="提供即時比特幣 (BTC) 走勢分析、TradingView 技術指標與 Gemini AI 自動化深度市場報告。">
@@ -23,8 +23,8 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 20px;
+      align-items: flex-start;
+      padding: 12px;
       position: relative;
       overflow-x: hidden;
     }
@@ -55,92 +55,119 @@
 
     .bg-glow-1 {
       position: fixed;
-      width: 500px;
-      height: 500px;
+      width: 400px;
+      height: 400px;
       background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(56, 189, 248, 0.05) 50%, rgba(0,0,0,0) 70%);
       top: -100px; right: -100px;
       filter: blur(40px);
       z-index: 0;
     }
 
-    /* 主卡片容器 */
+    /* 主容器：針對手機做彈性調整 */
     .container {
       position: relative;
       z-index: 2;
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      padding: 28px;
+      border-radius: 20px;
+      padding: 18px;
       box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
-      margin: 20px 0;
+      margin: 10px 0;
+    }
+
+    @media (min-width: 640px) {
+      .container { padding: 28px; }
+      body { padding: 20px; }
     }
 
     .header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      gap: 10px;
       margin-bottom: 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       padding-bottom: 15px;
     }
+
+    @media (min-width: 480px) {
+      .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
     .badge {
+      display: inline-block;
+      align-self: flex-start;
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.2));
       color: #38bdf8;
       border: 1px solid rgba(56, 189, 248, 0.5);
-      padding: 5px 14px;
+      padding: 5px 12px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
     }
 
-    /* TradingView 區塊 */
     .widget-section {
-      margin-bottom: 24px;
-      border-radius: 16px;
+      margin-bottom: 20px;
+      border-radius: 14px;
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.08);
       background: rgba(3, 7, 18, 0.6);
     }
+
     .section-title {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: #38bdf8;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
-    /* 報告區塊 */
+    /* 指標中文說明對照卡片 */
+    .indicator-legend {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 15px;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+
     .report-box {
       background: rgba(3, 7, 18, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 22px;
-      font-size: 0.95rem;
-      line-height: 1.8;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 0.9rem;
+      line-height: 1.75;
       white-space: pre-wrap;
       color: #e5e7eb;
     }
 
     .footer {
-      margin-top: 15px;
-      font-size: 0.75rem;
+      margin-top: 12px;
+      font-size: 0.72rem;
       color: #9ca3af;
       text-align: right;
     }
 
     .disclaimer-box {
-      margin-top: 25px;
-      padding: 16px;
+      margin-top: 20px;
+      padding: 14px;
       background: rgba(245, 158, 11, 0.1);
       border: 1px solid rgba(245, 158, 11, 0.4);
       border-radius: 12px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #e5e7eb;
       line-height: 1.6;
     }
@@ -152,15 +179,14 @@
   <div class="bg-glow-1"></div>
 
   <div class="container">
-    <!-- 頁頭 -->
     <div class="header">
-      <h1 style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;">比特幣走勢與 AI 智慧分析儀表板</h1>
+      <h1 style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px;">比特幣走勢與 AI 智慧分析儀表板</h1>
       <span class="badge">Gemini 2.5 + TradingView</span>
     </div>
 
-    <!-- 1. TradingView 即時走勢圖表 Widget -->
+    <!-- 1. K線走勢圖 (手機高 300px，電腦高 380px) -->
     <div class="section-title">📈 即時市場 K 線行情</div>
-    <div class="widget-section" style="height: 380px;">
+    <div class="widget-section" style="height: 320px;">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div id="tradingview_chart" style="height:calc(100% - 32px);width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -183,7 +209,7 @@
       </div>
     </div>
 
-    <!-- 2. TradingView 多空指針儀表 Widget (你截圖中的功能) -->
+    <!-- 2. 多空指針 Widget -->
     <div class="section-title">⏱️ 即時技術指標與多空指針</div>
     <div class="widget-section">
       <div class="tradingview-widget-container">
@@ -204,16 +230,23 @@
       </div>
     </div>
 
-    <!-- 3. Gemini AI 結構化深度報告 -->
+    <!-- 中英文指標簡介小卡片 -->
+    <div class="indicator-legend">
+      <strong>💡 常用技術指標中英對照說明：</strong><br>
+      • <strong>RSI (Relative Strength Index / 相對強弱指標)</strong>：評估市場超買（>70）或超賣（<30）狀態。<br>
+      • <strong>MACD (Moving Average Convergence Divergence / 平滑異同移動平均線)</strong>：判斷動能與趨勢轉折。<br>
+      • <strong>EMA / SMA (Moving Averages / 移動平均線)</strong>：觀察短中長期價格平均支撐與壓力位。
+    </div>
+
+    <!-- 3. Gemini AI 深度報告 -->
     <div class="section-title">🤖 Gemini AI 綜合評估與建議</div>
     <div id="summary" class="report-box">資料讀取中，請稍候...</div>
 
     <div id="time" class="footer"></div>
 
-    <!-- 免責聲明 -->
     <div class="disclaimer-box">
       <strong style="color: #f59e0b;">⚠️ 【免責聲明與風險警示】</strong><br>
-      本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。加密貨幣市場具高風險，請自行承擔投資風險。
+      本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。
     </div>
   </div>
 
