@@ -2,8 +2,9 @@ name: BTC Auto Analysis
 
 on:
   schedule:
-    - cron: '*/45 * * * *'
-  workflow_dispatch: # 支援手動按鈕觸發
+    # 改為每 15 分鐘觸發一次 (降低 GitHub 延遲造成的影響)
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # 保留手動觸發按鈕
 
 jobs:
   run-analysis:
