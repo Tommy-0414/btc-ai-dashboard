@@ -2,22 +2,15 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="google-site-verification" content="10h7ZCN-tTjjTxmx0T77ovc34P8kPWqy3uhLgT2ltwc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
-  <title>加密貨幣走勢與 AI 消息面分析儀表板</title>
-  <meta name="description" content="提供即時比特幣 (BTC) 與乙太幣 (ETH) 走勢分析、TradingView 技術指標儀表板與 Gemini AI 自動化深度市場評估報告。">
-  <meta name="keywords" content="比特幣走勢, 乙太幣走勢, 比特幣分析, BTC即時行情, 加密貨幣, AI技術分析, TradingView">
-  <meta name="author" content="Tommy">
-  <meta name="robots" content="index, follow">
-
+  <title>加密貨幣 AI 智慧分析儀表板</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       background: #030712;
       color: #f3f4f6;
       min-height: 100vh;
@@ -25,118 +18,91 @@
       justify-content: center;
       align-items: flex-start;
       padding: 12px;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    .cyber-grid {
-      position: fixed;
-      width: 200%;
-      height: 100%;
-      top: 40%;
-      left: -50%;
-      background-image: 
-        linear-gradient(to right, rgba(56, 189, 248, 0.1) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(56, 189, 248, 0.1) 1px, transparent 1px);
-      background-size: 60px 60px;
-      transform: perspective(500px) rotateX(65deg) translateZ(0);
-      will-change: transform;
-      animation: gridMove 12s linear infinite;
-      z-index: 0;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 80%);
-      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 80%);
-    }
-
-    @keyframes gridMove {
-      0% { transform: perspective(500px) rotateX(65deg) translateY(0) translateZ(0); }
-      100% { transform: perspective(500px) rotateX(65deg) translateY(60px) translateZ(0); }
-    }
-
-    .bg-glow-1 {
-      position: fixed;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(56, 189, 248, 0.05) 50%, rgba(0,0,0,0) 70%);
-      top: -100px; right: -100px;
-      filter: blur(40px);
-      z-index: 0;
     }
 
     .container {
-      position: relative;
-      z-index: 2;
       width: 100%;
       max-width: 850px;
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(56, 189, 248, 0.15);
+      padding: 20px;
       margin: 10px 0;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     }
 
-    @media (min-width: 640px) {
-      .container { padding: 28px; }
-      body { padding: 20px; }
-    }
-
-    .header {
+    /* 1. 首頁入口卡片樣式 */
+    .selection-screen {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 15px;
+      gap: 20px;
+      padding: 20px 0;
     }
 
-    @media (min-width: 480px) {
-      .header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      }
-    }
-
-    .badge {
-      display: inline-block;
-      align-self: flex-start;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.2));
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    /* 幣種切換頁籤 */
-    .tab-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      background: rgba(15, 23, 42, 0.6);
-      color: #9ca3af;
-      font-weight: 600;
-      cursor: pointer;
+    .select-title {
       text-align: center;
-      transition: all 0.3s ease;
-      font-size: 0.9rem;
-    }
-    .tab-btn.active {
-      background: linear-gradient(135deg, #0284c7, #38bdf8);
-      color: #ffffff;
+      font-size: 1.3rem;
       font-weight: 800;
-      border-color: #38bdf8;
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      margin-bottom: 10px;
     }
+
+    .cards-wrapper {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 600px) {
+      .cards-wrapper { grid-template-columns: 1fr 1fr; }
+    }
+
+    .coin-card {
+      background: rgba(3, 7, 18, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      padding: 30px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .coin-card:hover {
+      transform: translateY(-5px);
+      border-color: #38bdf8;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+    }
+
+    .coin-icon { font-size: 3rem; margin-bottom: 10px; }
+    .coin-name { font-size: 1.2rem; font-weight: 800; color: #fff; }
+    .coin-desc { font-size: 0.8rem; color: #9ca3af; margin-top: 6px; }
+
+    /* 2. 詳細儀表板頁面 (預設隱藏) */
+    .dashboard-screen { display: none; }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+    }
+
+    .back-btn {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+
+    .back-btn:hover { background: #38bdf8; color: #000; }
 
     .widget-section {
       margin-bottom: 20px;
@@ -151,12 +117,8 @@
       font-weight: 700;
       color: #38bdf8;
       margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    /* 指標中文對照說明卡片 */
     .indicator-legend {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -166,20 +128,6 @@
       font-size: 0.78rem;
       color: #9ca3af;
       line-height: 1.6;
-    }
-
-    .ai-info-banner {
-      background: rgba(56, 189, 248, 0.08);
-      border-left: 3px solid #38bdf8;
-      padding: 10px 14px;
-      border-radius: 6px;
-      margin-bottom: 12px;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
     }
 
     .report-box {
@@ -193,15 +141,8 @@
       color: #e5e7eb;
     }
 
-    .footer {
-      margin-top: 12px;
-      font-size: 0.72rem;
-      color: #9ca3af;
-      display: flex;
-      justify-content: space-between;
-    }
+    .footer { margin-top: 10px; font-size: 0.72rem; color: #9ca3af; text-align: right; }
 
-    /* 黃色免責聲明與風險警示卡片 */
     .disclaimer-box {
       margin-top: 20px;
       padding: 14px;
@@ -216,58 +157,64 @@
 </head>
 <body>
 
-  <div class="cyber-grid"></div>
-  <div class="bg-glow-1"></div>
-
   <div class="container">
-    <div class="header">
-      <h1 style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px;">加密貨幣走勢與 AI 智慧分析儀表板</h1>
-      <span class="badge">Gemini 2.5 + TradingView</span>
+    
+    <!-- 畫面 1: 首頁選擇區 -->
+    <div id="selection-screen" class="selection-screen">
+      <div class="select-select-title">請選擇欲查看的加密貨幣儀表板</div>
+      <div class="cards-wrapper">
+        <div class="coin-card" onclick="openDashboard('BTC')">
+          <div class="coin-icon">₿</div>
+          <div class="coin-name">比特幣 (BTC)</div>
+          <div class="coin-desc">即時行情 K 線、多空指標與 Gemini AI 新聞分析</div>
+        </div>
+        <div class="coin-card" onclick="openDashboard('ETH')">
+          <div class="coin-icon">Ξ</div>
+          <div class="coin-name">乙太幣 (ETH)</div>
+          <div class="coin-desc">即時行情 K 線、多空指標與 Gemini AI 新聞分析</div>
+        </div>
+      </div>
     </div>
 
-    <!-- 幣種切換區塊 -->
-    <div class="tab-group">
-      <div id="tab-btc" class="tab-btn active" onclick="switchCoin('BTC')">₿ 比特幣 (BTC)</div>
-      <div id="tab-eth" class="tab-btn" onclick="switchCoin('ETH')">Ξ 乙太幣 (ETH)</div>
+    <!-- 畫面 2: 詳細內容頁面 (內含返回鍵) -->
+    <div id="dashboard-screen" class="dashboard-screen">
+      <div class="top-bar">
+        <button class="back-btn" onclick="backToHome()">← 返回幣種選擇</button>
+        <h2 id="current-coin-title" style="font-size: 1.1rem;">-</h2>
+      </div>
+
+      <!-- 1. K線圖 -->
+      <div class="section-title">📈 即時市場 K 線行情</div>
+      <div class="widget-section" style="height: 320px;">
+        <div id="tv_chart_container" style="height:100%;width:100%"></div>
+      </div>
+
+      <!-- 2. 多空指針 Widget (加回此區塊) -->
+      <div class="section-title">⏱️ 技術指標與多空指針</div>
+      <div class="widget-section" id="gauge-container">
+        <!-- 動態插入指針語法 -->
+      </div>
+
+      <!-- 指標說明卡片 -->
+      <div class="indicator-legend">
+        <strong>💡 常用技術指標中英對照說明：</strong><br>
+        • <strong>RSI (Relative Strength Index / 相對強弱指標)</strong>：評估超買（>70）或超賣（<30）。<br>
+        • <strong>MACD (Moving Average Convergence Divergence / 平滑異同移動平均線)</strong>：判斷趨勢轉折。<br>
+        • <strong>EMA / SMA (Moving Averages / 移動平均線)</strong>：觀察長短期平均支撐與壓力位。
+      </div>
+
+      <!-- 3. AI 消息面報告 -->
+      <div class="section-title">🤖 Gemini AI 消息與技術面綜合報告</div>
+      <div id="summary" class="report-box">資料載入中...</div>
+      <div id="time" class="footer"></div>
+
+      <!-- 免責聲明 -->
+      <div class="disclaimer-box">
+        <strong style="color: #f59e0b;">⚠️ 【免責聲明與風險警示】</strong><br>
+        本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。加密貨幣市場具高風險，請自行承擔投資風險。
+      </div>
     </div>
 
-    <!-- 1. K線走勢圖 -->
-    <div class="section-title">
-      <span>📈 即時市場 K 線行情 (秒級更新)</span>
-    </div>
-    <div class="widget-section" style="height: 320px;">
-      <div id="tv_chart_container" style="height:100%;width:100%"></div>
-    </div>
-
-    <!-- 中英文指標簡介小卡片 -->
-    <div class="indicator-legend">
-      <strong>💡 常用技術指標中英對照說明：</strong><br>
-      • <strong>RSI (Relative Strength Index / 相對強弱指標)</strong>：評估超買（>70）或超賣（<30）。<br>
-      • <strong>MACD (Moving Average Convergence Divergence / 平滑異同移動平均線)</strong>：判斷趨勢轉折。<br>
-      • <strong>EMA / SMA (Moving Averages / 移動平均線)</strong>：觀察長短期平均支撐與壓力位。
-    </div>
-
-    <!-- 2. Gemini AI 深度報告 (含時間差與消息面說明) -->
-    <div class="section-title">
-      <span>🤖 Gemini AI 消息與技術面綜合評估</span>
-    </div>
-
-    <div class="ai-info-banner">
-      <span>ℹ️ 本報告由 AI 定期抓取市場數據與最新新聞生成，與上方秒級 K 線有微小時間差屬正常現象。</span>
-    </div>
-
-    <div id="summary" class="report-box">資料讀取中，請稍候...</div>
-
-    <div class="footer">
-      <span id="ai-status">⚡ 數據狀態：自動同步中</span>
-      <span id="time">更新時間載入中...</span>
-    </div>
-
-    <!-- 黃色免責聲明與風險警示 -->
-    <div class="disclaimer-box">
-      <strong style="color: #f59e0b;">⚠️ 【免責聲明與風險警示】</strong><br>
-      本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。加密貨幣市場具高風險，請自行承擔投資風險。
-    </div>
   </div>
 
   <script src="https://s3.tradingview.com/tv.js"></script>
@@ -276,12 +223,16 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qZXlxYWluYXpwenBscG12dG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTk2NDgsImV4cCI6MjEwMjM3NTY0OH0.S5pz_jwxpLVI7o95hZK4o9lEZ1eAm1O7ejdr1giU1Xs';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentSymbol = 'BTC';
+    function openDashboard(symbol) {
+      document.getElementById('selection-screen').style.display = 'none';
+      document.getElementById('dashboard-screen').style.display = 'block';
+      
+      const coinName = symbol === 'BTC' ? '比特幣 (BTC)' : '乙太幣 (ETH)';
+      document.getElementById('current-coin-title').innerText = `${coinName} 分析儀表板`;
 
-    // 渲染 TradingView K 線
-    function loadTradingView(symbol) {
-      document.getElementById('tv_chart_container').innerHTML = '';
+      // 1. 載入 K 線 Widget
       const pair = symbol === 'BTC' ? 'BITSTAMP:BTCUSD' : 'BITSTAMP:ETHUSD';
+      document.getElementById('tv_chart_container').innerHTML = '';
       new TradingView.widget({
         "autosize": true,
         "symbol": pair,
@@ -290,17 +241,40 @@
         "theme": "dark",
         "style": "1",
         "locale": "zh_TW",
-        "toolbar_bg": "#f1f3f6",
-        "enable_publishing": false,
-        "hide_top_toolbar": false,
-        "save_image": false,
         "container_id": "tv_chart_container"
       });
+
+      // 2. 載入多空指針 Widget (動態腳本)
+      const gaugeContainer = document.getElementById('gauge-container');
+      gaugeContainer.innerHTML = ''; // 清空舊指針
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
+        "interval": "1D",
+        "width": "100%",
+        "isTransparent": true,
+        "height": "420",
+        "symbol": pair,
+        "showIntervalTabs": true,
+        "displayMode": "single",
+        "locale": "zh_TW",
+        "colorTheme": "dark"
+      });
+      gaugeContainer.appendChild(script);
+
+      // 3. 從 Supabase 抓取 AI 報告
+      fetchAnalysis(symbol);
     }
 
-    // 抓取 Supabase 的最新 AI 報告
+    function backToHome() {
+      document.getElementById('dashboard-screen').style.display = 'none';
+      document.getElementById('selection-screen').style.display = 'flex';
+    }
+
     async function fetchAnalysis(symbol) {
-      document.getElementById('summary').innerText = `正在讀取 ${symbol} 最新 AI 分析報告...`;
+      document.getElementById('summary').innerText = `正在讀取 ${symbol} 的最新 AI 消息面報告...`;
       
       const { data, error } = await supabaseClient
         .from('btc_analysis')
@@ -310,36 +284,13 @@
         .limit(1);
 
       if (error || !data || data.length === 0) {
-        // 相容舊資料邏輯（若 Supabase 表格中舊資料尚未寫入 symbol 欄位）
-        const fallback = await supabaseClient.from('btc_analysis').select('*').order('created_at', { ascending: false }).limit(1);
-        if (fallback.data && fallback.data.length > 0) {
-          document.getElementById('summary').innerText = fallback.data[0].summary;
-          document.getElementById('time').innerText = 'AI 報告上次生成時間：' + new Date(fallback.data[0].created_at).toLocaleString('zh-TW');
-        } else {
-          document.getElementById('summary').innerText = '暫無分析數據';
-        }
+        document.getElementById('summary').innerText = '暫無分析數據，請確保後端已產生資料。';
         return;
       }
 
       document.getElementById('summary').innerText = data[0].summary;
-      document.getElementById('time').innerText = 'AI 報告上次生成時間：' + new Date(data[0].created_at).toLocaleString('zh-TW');
+      document.getElementById('time').innerText = 'AI 報告生成時間：' + new Date(data[0].created_at).toLocaleString('zh-TW');
     }
-
-    // 切換幣種
-    function switchCoin(symbol) {
-      currentSymbol = symbol;
-      document.getElementById('tab-btc').classList.toggle('active', symbol === 'BTC');
-      document.getElementById('tab-eth').classList.toggle('active', symbol === 'ETH');
-      
-      loadTradingView(symbol);
-      fetchAnalysis(symbol);
-    }
-
-    // 初始化預設為 BTC
-    switchCoin('BTC');
-
-    // 每 60 秒在背景自動重新檢查 Supabase
-    setInterval(() => fetchAnalysis(currentSymbol), 60000);
   </script>
 </body>
 </html>
