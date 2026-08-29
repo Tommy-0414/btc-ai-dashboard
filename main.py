@@ -1,73 +1,96 @@
 import os
 import requests
-from google import genai
+import google.generativeai as genai
 from supabase import create_client, Client
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+# 1. 初始化環境變數
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-ai_client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def get_btc_data():
-    url = "https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false"
-    headers = {"accept": "application/json", "Cache-Control": "no-cache"}
-    res = requests.get(url, headers=headers).json()
-    
-    market_data = res.get('market_data', {})
-    
+# 2. 抓取最新加密貨幣新聞的函式
+def fetch_crypto_news(symbol="BTC"):
+    try:
+        # 使用 CryptoCompare 免費新聞 API
+        url = f"https://min-api.cryptocompare.com/data/v2/news/?categories={symbol}&excludeCategories=Sponsored"
+        res = requests.get(url, timeout=10).json()
+        news_items = res.get("Data", [])[:5] # 取最新 5 則新聞
+        
+        news_text = ""
+        for i, news in enumerate(news_items, 1):
+            title = news.get("title", "")
+            source = news.get("source_info", {}).get("name", "加密新聞")
+            news_text += f"{i}. [{source}] {title}\n"
+        return news_text if news_text else "暫無最新重大新聞。"
+    except Exception as e:
+        print(f"抓取新聞失敗 ({symbol}): {e}")
+        return "新聞數據抓取失敗，依據技術面進行分析。"
+
+# 3. 抓取即時價格與技術指標
+def fetch_market_data(symbol="BTC"):
+    # 這裡可以用你原本抓取 TradingView / Binance 價格的邏輯
+    symbol_pair = "BTCUSDT" if symbol == "BTC" else "ETHUSDT"
+    res = requests.get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol_pair}").json()
     return {
-        "price": round(float(market_data['current_price']['usd']), 2),
-        "price_change": round(float(market_data['price_change_percentage_24h']), 2),
-        "high": round(float(market_data['high_24h']['usd']), 2),
-        "low": round(float(market_data['low_24h']['usd']), 2),
-        "ath": round(float(market_data['ath']['usd']), 2),
-        "volume": round(float(market_data['total_volume']['usd']), 2)
+        "price": float(res["lastPrice"]),
+        "high": float(res["highPrice"]),
+        "low": float(res["lowPrice"]),
+        "volume": float(res["volume"]),
+        "change": float(res["priceChangePercent"])
     }
 
-def analyze_with_ai(data):
+# 4. 生成 AI 分析報告 (含新聞佐證)
+def generate_analysis(symbol="BTC"):
+    market_data = fetch_market_data(symbol)
+    news_data = fetch_crypto_news(symbol)
+    
+    coin_name = "比特幣 (BTC)" if symbol == "BTC" else "乙太幣 (ETH)"
+    
     prompt = f"""
-    你是一名高階加密貨幣量化交易分析師。請根據以下即時數據進行深度且詳盡的市場技術分析報告：
-    - 即時價格：${data['price']} USDT
-    - 24H 漲跌幅：{data['price_change']}%
-    - 24H 最高價：${data['high']} USDT
-    - 24H 最低價：${data['low']} USDT
-    - 歷史最高價 (ATH)：${data['ath']} USDT
-    - 24H 總交易量：${data['volume']:,} USDT
+    你是一位專業的加密貨幣市場分析師。請針對【{coin_name}】進行綜合走勢分析。
 
-    排動與輸出格式要求：
-    1. 絕對不要使用任何星號符號 (例如 ** 或 * )，避免出現亂碼與 Markdown 符號。
-    2. 請直接使用以下定義好的文字區塊輸出報告：
+    【市場即時數據】：
+    - 當前價格：${market_data['price']} USDT
+    - 24小時最高價：${market_data['high']} USDT
+    - 24小時最低價：${market_data['low']} USDT
+    - 24小時漲跌幅：{market_data['change']}%
+    - 24小時成交量：{market_data['volume']}
 
-    【多空方向評級】
-    市場趨勢：[強勢看多 / 偏多看待 / 盤整觀望 / 偏空看待 / 強勢看空]
-    短線策略：[建議逢低佈局 / 建議逢高減碼 / 建議觀望等待突破]
+    【最新市場重大新聞摘要】：
+    {news_data}
 
-    【關鍵價位分析】
-    上方強阻力位：估算價格與說明
-    下方強支撐位：估算價格與說明
+    請輸出格式嚴謹的分析報告，必須包含以下三個區塊：
+    
+    【市場走勢與技術面評估】
+    （說明當前價格位階、支撐與壓力區間）
 
-    【深度行情與技術解讀】
-    詳細分析當前價格在 24H 波動區間內的位置、多空雙方力量拉鋸情形，以及交易量對當前趨勢的佐證程度（約 150-200 字）。
+    【消息面與新聞事件解讀】
+    （重點！請結合上面提供的【最新市場重大新聞摘要】，具體分析這些新聞事件對 {symbol} 價格走勢帶來的正面或負面影響，讓讀者知道分析的依據）
 
-    【操作建議與風險提示】
-    提供針對短期交易者與中長期持有者具體的入場思維、注意事項及嚴格的停損概念（約 100 字）。
+    【綜合操作建議與風險提示】
+    （給出短中期的操作建議與止損風險提示）
     """
     
-    response = ai_client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt,
-    )
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    response = model.generate_content(prompt)
     return response.text
 
+# 5. 執行分析並寫入 Supabase (分別記錄 BTC 與 ETH)
+def main():
+    for symbol in ["BTC", "ETH"]:
+        print(f"正在分析 {symbol}...")
+        summary = generate_analysis(symbol)
+        
+        # 寫入 Supabase (建議資料表新增 symbol 欄位，或個別更新)
+        data = {
+            "symbol": symbol, # 請確保 Supabase btc_analysis 資料表有 symbol 欄位 (預設可設 BTC)
+            "summary": summary
+        }
+        supabase.table("btc_analysis").insert(data).execute()
+        print(f"{symbol} 分析完成並已寫入 Supabase！")
+
 if __name__ == "__main__":
-    btc_data = get_btc_data()
-    analysis_result = analyze_with_ai(btc_data)
-    
-    supabase.table("btc_analysis").insert({
-        "price": btc_data["price"],
-        "summary": analysis_result,
-        "raw_data": btc_data
-    }).execute()
-    print(f"最新價格 ${btc_data['price']} 與詳細分析已寫入 Supabase！")
+    main()
