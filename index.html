@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <meta name="google-site-verification" content="10h7ZCN-tTjjTxmx0T77ovc34P8kPWqy3uhLgT2ltwc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="提供即時比特幣 (BTC) 走勢分析、TradingView 技術指標儀表板與 Gemini AI 自動化深度市場評估報告。">
   
-  <title>比特幣走勢與即時價格分析 | BTC AI 技術預測儀表板</title>
-  <meta name="description" content="提供即時比特幣 (BTC) 走勢分析、TradingView 技術指標與 Gemini AI 自動化深度市場報告。">
-  <meta name="keywords" content="比特幣走勢, 比特幣分析, 比特幣今天價格, BTC即時行情, 加密貨幣, AI技術分析, TradingView, BTC走勢">
+  <title>加密貨幣走勢與 AI 消息面分析儀表板</title>
+  <meta name="description" content="提供即時比特幣 (BTC) 與乙太幣 (ETH) 走勢分析、TradingView 技術指標儀表板與 Gemini AI 自動化深度市場評估報告。">
+  <meta name="keywords" content="比特幣走勢, 乙太幣走勢, 比特幣分析, BTC即時行情, 加密貨幣, AI技術分析, TradingView">
   <meta name="author" content="Tommy">
   <meta name="robots" content="index, follow">
 
@@ -112,6 +111,33 @@
       font-weight: 600;
     }
 
+    /* 幣種切換頁籤 */
+    .tab-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(15, 23, 42, 0.6);
+      color: #9ca3af;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #ffffff;
+      font-weight: 800;
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+
     .widget-section {
       margin-bottom: 20px;
       border-radius: 14px;
@@ -130,6 +156,7 @@
       align-items: center;
     }
 
+    /* 指標中文對照說明卡片 */
     .indicator-legend {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -174,6 +201,7 @@
       justify-content: space-between;
     }
 
+    /* 黃色免責聲明與風險警示卡片 */
     .disclaimer-box {
       margin-top: 20px;
       padding: 14px;
@@ -193,8 +221,14 @@
 
   <div class="container">
     <div class="header">
-      <h1 style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px;">比特幣走勢與 AI 智慧分析儀表板</h1>
+      <h1 style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px;">加密貨幣走勢與 AI 智慧分析儀表板</h1>
       <span class="badge">Gemini 2.5 + TradingView</span>
+    </div>
+
+    <!-- 幣種切換區塊 -->
+    <div class="tab-group">
+      <div id="tab-btc" class="tab-btn active" onclick="switchCoin('BTC')">₿ 比特幣 (BTC)</div>
+      <div id="tab-eth" class="tab-btn" onclick="switchCoin('ETH')">Ξ 乙太幣 (ETH)</div>
     </div>
 
     <!-- 1. K線走勢圖 -->
@@ -202,49 +236,7 @@
       <span>📈 即時市場 K 線行情 (秒級更新)</span>
     </div>
     <div class="widget-section" style="height: 320px;">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div id="tradingview_chart" style="height:calc(100% - 32px);width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-        <script type="text/javascript">
-          new TradingView.widget({
-            "autosize": true,
-            "symbol": "BITSTAMP:BTCUSD",
-            "interval": "60",
-            "timezone": "Asia/Taipei",
-            "theme": "dark",
-            "style": "1",
-            "locale": "zh_TW",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_top_toolbar": false,
-            "save_image": false,
-            "container_id": "tradingview_chart"
-          });
-        </script>
-      </div>
-    </div>
-
-    <!-- 2. 多空指針 Widget -->
-    <div class="section-title">
-      <span>⏱️ 技術指標與多空指針</span>
-    </div>
-    <div class="widget-section">
-      <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
-        {
-          "interval": "1D",
-          "width": "100%",
-          "isTransparent": true,
-          "height": "420",
-          "symbol": "BITSTAMP:BTCUSD",
-          "showIntervalTabs": true,
-          "displayMode": "single",
-          "locale": "zh_TW",
-          "colorTheme": "dark"
-        }
-        </script>
-      </div>
+      <div id="tv_chart_container" style="height:100%;width:100%"></div>
     </div>
 
     <!-- 中英文指標簡介小卡片 -->
@@ -255,14 +247,13 @@
       • <strong>EMA / SMA (Moving Averages / 移動平均線)</strong>：觀察長短期平均支撐與壓力位。
     </div>
 
-    <!-- 3. Gemini AI 深度報告 (含時間差說明 banner) -->
+    <!-- 2. Gemini AI 深度報告 (含時間差與消息面說明) -->
     <div class="section-title">
-      <span>🤖 Gemini AI 週期性綜合評估</span>
+      <span>🤖 Gemini AI 消息與技術面綜合評估</span>
     </div>
 
-    <!-- 資訊提示橫幅 -->
     <div class="ai-info-banner">
-      <span>ℹ️ 本報告由 AI 定期抓取市場數據生成，與上方秒級 K 線有微小時間差屬正常現象。</span>
+      <span>ℹ️ 本報告由 AI 定期抓取市場數據與最新新聞生成，與上方秒級 K 線有微小時間差屬正常現象。</span>
     </div>
 
     <div id="summary" class="report-box">資料讀取中，請稍候...</div>
@@ -272,43 +263,83 @@
       <span id="time">更新時間載入中...</span>
     </div>
 
+    <!-- 黃色免責聲明與風險警示 -->
     <div class="disclaimer-box">
       <strong style="color: #f59e0b;">⚠️ 【免責聲明與風險警示】</strong><br>
-      本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。
+      本網站所有數據、TradingView 指標與 Gemini AI 分析報告僅供個人學術研究與技術實驗參考，不構成任何形式之投資建議。加密貨幣市場具高風險，請自行承擔投資風險。
     </div>
   </div>
 
+  <script src="https://s3.tradingview.com/tv.js"></script>
   <script>
     const SUPABASE_URL = 'https://njeyqainazpzplpmvtnh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qZXlxYWluYXpwenBscG12dG5oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3OTk2NDgsImV4cCI6MjEwMjM3NTY0OH0.S5pz_jwxpLVI7o95hZK4o9lEZ1eAm1O7ejdr1giU1Xs';
-    
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    async function fetchLatestAnalysis() {
+    let currentSymbol = 'BTC';
+
+    // 渲染 TradingView K 線
+    function loadTradingView(symbol) {
+      document.getElementById('tv_chart_container').innerHTML = '';
+      const pair = symbol === 'BTC' ? 'BITSTAMP:BTCUSD' : 'BITSTAMP:ETHUSD';
+      new TradingView.widget({
+        "autosize": true,
+        "symbol": pair,
+        "interval": "60",
+        "timezone": "Asia/Taipei",
+        "theme": "dark",
+        "style": "1",
+        "locale": "zh_TW",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_top_toolbar": false,
+        "save_image": false,
+        "container_id": "tv_chart_container"
+      });
+    }
+
+    // 抓取 Supabase 的最新 AI 報告
+    async function fetchAnalysis(symbol) {
+      document.getElementById('summary').innerText = `正在讀取 ${symbol} 最新 AI 分析報告...`;
+      
       const { data, error } = await supabaseClient
         .from('btc_analysis')
         .select('*')
+        .eq('symbol', symbol)
         .order('created_at', { ascending: false })
         .limit(1);
 
-      if (error) {
-        document.getElementById('summary').innerText = '載入失敗：' + error.message;
+      if (error || !data || data.length === 0) {
+        // 相容舊資料邏輯（若 Supabase 表格中舊資料尚未寫入 symbol 欄位）
+        const fallback = await supabaseClient.from('btc_analysis').select('*').order('created_at', { ascending: false }).limit(1);
+        if (fallback.data && fallback.data.length > 0) {
+          document.getElementById('summary').innerText = fallback.data[0].summary;
+          document.getElementById('time').innerText = 'AI 報告上次生成時間：' + new Date(fallback.data[0].created_at).toLocaleString('zh-TW');
+        } else {
+          document.getElementById('summary').innerText = '暫無分析數據';
+        }
         return;
       }
 
-      if (data && data.length > 0) {
-        const result = data[0];
-        document.getElementById('summary').innerText = result.summary;
-        
-        const date = new Date(result.created_at);
-        document.getElementById('time').innerText = 'AI 報告上次生成時間：' + date.toLocaleString('zh-TW');
-      }
+      document.getElementById('summary').innerText = data[0].summary;
+      document.getElementById('time').innerText = 'AI 報告上次生成時間：' + new Date(data[0].created_at).toLocaleString('zh-TW');
     }
 
-    fetchLatestAnalysis();
+    // 切換幣種
+    function switchCoin(symbol) {
+      currentSymbol = symbol;
+      document.getElementById('tab-btc').classList.toggle('active', symbol === 'BTC');
+      document.getElementById('tab-eth').classList.toggle('active', symbol === 'ETH');
+      
+      loadTradingView(symbol);
+      fetchAnalysis(symbol);
+    }
 
-    // 每 60 秒在背景自動重新檢查 Supabase 是否有最新 AI 報告
-    setInterval(fetchLatestAnalysis, 60000);
+    // 初始化預設為 BTC
+    switchCoin('BTC');
+
+    // 每 60 秒在背景自動重新檢查 Supabase
+    setInterval(() => fetchAnalysis(currentSymbol), 60000);
   </script>
 </body>
 </html>
