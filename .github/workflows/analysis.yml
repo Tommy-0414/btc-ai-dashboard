@@ -2,9 +2,8 @@ name: BTC Auto Analysis
 
 on:
   schedule:
-    # 改為每 15 分鐘觸發一次 (降低 GitHub 延遲造成的影響)
-    - cron: '*/15 * * * *'
-  workflow_dispatch: # 保留手動觸發按鈕
+    - cron: '*/30 * * * *'  # 放寬至 30 分鐘
+  workflow_dispatch:
 
 jobs:
   run-analysis:
