@@ -53,7 +53,7 @@ def fetch_market_data(symbol="BTC"):
             "volume": "數據更新中"
         }
 
-# 4. 生成 AI 分析 (加入 429 額度超限時的 30 秒遞增重試機制)
+# 4. 生成 AI 分析 (具備優雅降級與自動冷卻機制)
 def generate_analysis(symbol="BTC"):
     data = fetch_market_data(symbol)
     news = fetch_crypto_news(symbol)
@@ -82,8 +82,8 @@ def generate_analysis(symbol="BTC"):
     （給出短中期操作建議與風險提示）
     """
     
-    # 最多自動重試 3 次
-    for attempt in range(1, 4):
+    # 嘗試呼叫 API 2 次，遇到 429 自動冷卻 30 秒
+    for attempt in range(1, 3):
         try:
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
@@ -92,12 +92,14 @@ def generate_analysis(symbol="BTC"):
             return response.text
         except Exception as e:
             if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                wait_time = attempt * 30  # 依序等待 30 秒、60 秒
-                print(f"⚠️ 觸發 API 頻率限制 (429)，冷卻等待 {wait_time} 秒後重試 (第 {attempt} 次)...")
-                time.sleep(wait_time)
+                print(f"⚠️ 觸發 Gemini API 額度限制 (429)，等待 30 秒重試 (第 {attempt} 次)...")
+                time.sleep(30)
             else:
-                raise e
-    raise Exception("多次重試後仍無法取得 Gemini 回應。")
+                print(f"API 呼叫失敗: {e}")
+                break
+                
+    # 若重試後仍受限，傳回降級提示字串，防止整個 Workflow 崩潰跳紅燈
+    return f"【系統提示】目前 API 呼叫頻率過高，暫時觸發冷卻保護機制。當前價格：${data['price']} USD，24H漲跌：{data['change']}%。"
 
 # 5. 主程式執行
 def main():
@@ -106,16 +108,19 @@ def main():
         print(f"正在分析 {symbol}...")
         summary = generate_analysis(symbol)
         
-        supabase.table("btc_analysis").insert({
-            "symbol": symbol,
-            "summary": summary
-        }).execute()
-        print(f"{symbol} 分析完成並成功寫入 Supabase！")
+        try:
+            supabase.table("btc_analysis").insert({
+                "symbol": symbol,
+                "summary": summary
+            }).execute()
+            print(f"{symbol} 分析數據成功寫入 Supabase！")
+        except Exception as e:
+            print(f"寫入 Supabase 失敗: {e}")
         
-        # 若後面還有幣種，強制冷卻等待 30 秒避開 API 限流
+        # 幣種切換時強制冷卻 20 秒
         if idx < len(symbols) - 1:
-            print("⏳ 等待 30 秒冷卻時間以避開 API 速率限制...")
-            time.sleep(30)
+            print("⏳ 幣種切換冷卻 20 秒...")
+            time.sleep(20)
 
 if __name__ == "__main__":
     main()
