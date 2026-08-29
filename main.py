@@ -78,7 +78,7 @@ def generate_analysis(symbol="BTC"):
     【綜合操作建議與風險提示】
     （給出短中期操作建議與風險提示）
     """
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('models/gemini-1.5-flash')
     response = model.generate_content(prompt)
     return response.text
 
