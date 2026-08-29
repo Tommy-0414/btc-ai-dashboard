@@ -3,6 +3,7 @@ import requests
 import google.generativeai as genai
 from supabase import create_client, Client
 
+# 1. 初始化環境變數
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -10,7 +11,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# 1. 抓取熱門加密新聞
+# 2. 抓取熱門加密新聞
 def fetch_crypto_news(symbol="BTC"):
     try:
         url = f"https://min-api.cryptocompare.com/data/v2/news/?categories={symbol}&excludeCategories=Sponsored"
@@ -27,18 +28,29 @@ def fetch_crypto_news(symbol="BTC"):
         print(f"抓取新聞失敗: {e}")
         return "新聞數據讀取失敗，僅針對技術面分析。"
 
-# 2. 抓取行情數據
+# 3. 抓取行情數據 (新增安全機制防護)
 def fetch_market_data(symbol="BTC"):
-    pair = "BTCUSDT" if symbol == "BTC" else "ETHUSDT"
-    res = requests.get(f"https://api.binance.com/api/v3/ticker/24hr?symbol={pair}").json()
-    return {
-        "price": float(res["lastPrice"]),
-        "high": float(res["highPrice"]),
-        "low": float(res["lowPrice"]),
-        "change": float(res["priceChangePercent"])
-    }
+    coin_id = "bitcoin" if symbol == "BTC" else "ethereum"
+    try:
+        # 使用 CoinGecko 免費公共 API
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd&include_24hr_vol=true&include_24hr_change=true"
+        res = requests.get(url, timeout=10).json()
+        
+        data = res.get(coin_id, {})
+        return {
+            "price": data.get("usd", "暫無數據"),
+            "change": round(data.get("usd_24h_change", 0.0), 2),
+            "volume": round(data.get("usd_24h_vol", 0.0), 2)
+        }
+    except Exception as e:
+        print(f"行情抓取失敗，使用備用機制: {e}")
+        return {
+            "price": "請參考即時K線圖",
+            "change": "波動中",
+            "volume": "數據更新中"
+        }
 
-# 3. 生成包含新聞佐證的 AI 分析
+# 4. 生成包含新聞佐證的 AI 分析
 def generate_analysis(symbol="BTC"):
     data = fetch_market_data(symbol)
     news = fetch_crypto_news(symbol)
@@ -47,40 +59,41 @@ def generate_analysis(symbol="BTC"):
     prompt = f"""
     你是一位資深加密貨幣分析師，請針對【{name}】進行綜合分析。
 
-    【市場數據】：
-    - 當前價格：${data['price']} USDT
-    - 24H最高 / 最低：${data['high']} / ${data['low']} USDT
+    【市場即時數據】：
+    - 當前價格：${data['price']} USD
     - 24H漲跌幅：{data['change']}%
+    - 24H成交量：{data['volume']}
 
     【最新市場新聞摘要】：
     {news}
 
-    請嚴格依照以下三個標題輸出報告：
+    請嚴格依照以下三個區塊輸出報告：
 
     【技術面與趨勢解讀】
-    （分析價格支撐位與壓力位）
+    （分析當前價格區間、支撐位與壓力位）
 
     【新聞消息面佐證】
-    （請明確引用上方提供的新聞標題與來源，分析該新聞對 {symbol} 是利多還是利空）
+    （請明確引用上方【最新市場新聞摘要】中的新聞標題與來源，分析該新聞事件對 {symbol} 價格走勢帶來的正面或負面影響）
 
-    【操作建議與風險提示】
-    （提供建議與止損點提示）
+    【綜合操作建議與風險提示】
+    （給出短中期操作建議與風險提示）
     """
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(prompt)
     return response.text
 
+# 5. 主程式執行
 def main():
     for symbol in ["BTC", "ETH"]:
         print(f"正在分析 {symbol}...")
         summary = generate_analysis(symbol)
         
-        # 存入 Supabase，需確保資料表包含 symbol 欄位
+        # 寫入 Supabase
         supabase.table("btc_analysis").insert({
             "symbol": symbol,
             "summary": summary
         }).execute()
-        print(f"{symbol} 寫入成功！")
+        print(f"{symbol} 分析完成並成功寫入 Supabase！")
 
 if __name__ == "__main__":
     main()
