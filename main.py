@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from google import genai
 from supabase import create_client, Client
@@ -52,7 +53,7 @@ def fetch_market_data(symbol="BTC"):
             "volume": "數據更新中"
         }
 
-# 4. 生成 AI 分析 (採用新版 SDK gemini-2.5-flash 模型)
+# 4. 生成 AI 分析 (加入 429 額度超限時的 30 秒遞增重試機制)
 def generate_analysis(symbol="BTC"):
     data = fetch_market_data(symbol)
     news = fetch_crypto_news(symbol)
@@ -81,16 +82,27 @@ def generate_analysis(symbol="BTC"):
     （給出短中期操作建議與風險提示）
     """
     
-    # 新版 SDK 的模型生成語法
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt
-    )
-    return response.text
+    # 最多自動重試 3 次
+    for attempt in range(1, 4):
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt
+            )
+            return response.text
+        except Exception as e:
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                wait_time = attempt * 30  # 依序等待 30 秒、60 秒
+                print(f"⚠️ 觸發 API 頻率限制 (429)，冷卻等待 {wait_time} 秒後重試 (第 {attempt} 次)...")
+                time.sleep(wait_time)
+            else:
+                raise e
+    raise Exception("多次重試後仍無法取得 Gemini 回應。")
 
 # 5. 主程式執行
 def main():
-    for symbol in ["BTC", "ETH"]:
+    symbols = ["BTC", "ETH"]
+    for idx, symbol in enumerate(symbols):
         print(f"正在分析 {symbol}...")
         summary = generate_analysis(symbol)
         
@@ -99,6 +111,11 @@ def main():
             "summary": summary
         }).execute()
         print(f"{symbol} 分析完成並成功寫入 Supabase！")
+        
+        # 若後面還有幣種，強制冷卻等待 30 秒避開 API 限流
+        if idx < len(symbols) - 1:
+            print("⏳ 等待 30 秒冷卻時間以避開 API 速率限制...")
+            time.sleep(30)
 
 if __name__ == "__main__":
     main()
