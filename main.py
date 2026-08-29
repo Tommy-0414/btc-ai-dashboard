@@ -1,24 +1,23 @@
 import os
 import requests
-import google.generativeai as genai
+from google import genai
 from supabase import create_client, Client
 
-# 1. 初始化環境變數
+# 1. 初始化環境變數與新版 SDK Client
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-genai.configure(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# 2. 抓取熱門加密新聞 (修復 slice 錯誤)
+# 2. 抓取熱門加密新聞
 def fetch_crypto_news(symbol="BTC"):
     try:
         url = f"https://min-api.cryptocompare.com/data/v2/news/?categories={symbol}&excludeCategories=Sponsored"
         res = requests.get(url, timeout=10).json()
         news_data = res.get("Data", [])
         
-        # 安全取前 5 則新聞
         news_items = news_data[:5] if isinstance(news_data, list) else []
         
         news_text = ""
@@ -53,7 +52,7 @@ def fetch_market_data(symbol="BTC"):
             "volume": "數據更新中"
         }
 
-# 4. 生成 AI 分析 (修復 Gemini 模型路徑)
+# 4. 生成 AI 分析 (採用新版 SDK gemini-2.5-flash 模型)
 def generate_analysis(symbol="BTC"):
     data = fetch_market_data(symbol)
     news = fetch_crypto_news(symbol)
@@ -82,16 +81,12 @@ def generate_analysis(symbol="BTC"):
     （給出短中期操作建議與風險提示）
     """
     
-    # 這裡直接傳入 'gemini-1.5-flash'（SDK 會自動處理前綴）
-    try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception:
-        # 備用相容模型名稱
-        model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(prompt)
-        return response.text
+    # 新版 SDK 的模型生成語法
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt
+    )
+    return response.text
 
 # 5. 主程式執行
 def main():
