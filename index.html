@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- ⚠️ 請將下方 content 裡面的字串替換為你在 Google Search Console 取得的驗證碼 ⚠️ -->
+  <meta name="google-site-verification" content="google-site-verification: google4e7914e1a0ae18ee.html" />
+
   <title>加密貨幣 AI 智慧分析儀表板</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -161,7 +165,7 @@
     
     <!-- 畫面 1: 首頁選擇區 -->
     <div id="selection-screen" class="selection-screen">
-      <div class="select-select-title">請選擇欲查看的加密貨幣儀表板</div>
+      <div class="select-title">請選擇欲查看的加密貨幣儀表板</div>
       <div class="cards-wrapper">
         <div class="coin-card" onclick="openDashboard('BTC')">
           <div class="coin-icon">₿</div>
@@ -189,7 +193,7 @@
         <div id="tv_chart_container" style="height:100%;width:100%"></div>
       </div>
 
-      <!-- 2. 多空指針 Widget (加回此區塊) -->
+      <!-- 2. 多空指針 Widget -->
       <div class="section-title">⏱️ 技術指標與多空指針</div>
       <div class="widget-section" id="gauge-container">
         <!-- 動態插入指針語法 -->
