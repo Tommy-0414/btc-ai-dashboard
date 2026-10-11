@@ -23,11 +23,11 @@ def fetch_crypto_news(symbol="BTC"):
         if res.status_code == 200:
             posts = res.json()
             for i, post in enumerate(posts, 1):
-                # WordPress API 的標題通常存在 rendered 欄位裡，並包含 HTML entity 需要簡單處理
+                # WordPress API 的標題存在 rendered 欄位裡
                 title = post.get("title", {}).get("rendered", "")
-                # 簡單清理 HTML 標籤（若有）
+                # 清理常見的 HTML 轉義字元
                 title = title.replace("&#8211;", "-").replace("&#8220;", "\"").replace("&#8221;", "\"")
-                news_text += f"{i. [動區動趨] {title}\n"
+                news_text += f"{i}. [動區動趨] {title}\n"
     except Exception as e:
         print(f"抓取動區新聞失敗: {e}")
 
