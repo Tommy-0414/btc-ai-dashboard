@@ -7,9 +7,17 @@
   <!-- Google Search Console 驗證標籤 -->
   <meta name="google-site-verification" content="10h7ZCN-tTjjTxmx0T77ovc34P8kPWqy3uhLgT2ltwc" />
 
-  <title>加密貨幣 AI 智慧分析儀表板</title>
+  <!-- 1. Google 搜尋顯示的網站標題與簡介 -->
+  <title>虛擬貨幣分析網站</title>
+  <meta name="description" content="提供比特幣(BTC)與乙太幣(ETH)的即時行情K線、多空技術指標，以及結合 Gemini AI 與動區頭條新聞的智慧分析報告。">
+
+  <!-- 2. 社群分享 (Line, FB) 顯示名稱 -->
+  <meta property="og:title" content="虛擬貨幣分析網站">
+  <meta property="og:description" content="即時加密貨幣 K 線行情與 Gemini AI 新聞綜合分析報告">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -22,18 +30,77 @@
       justify-content: center;
       align-items: flex-start;
       padding: 12px;
+      position: relative;
+      overflow-x: hidden;
     }
 
+    /* 🌌 背景動態呼吸燈光暈效果 */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      width: 450px;
+      height: 450px;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.45;
+      animation: pulseGlow 10s infinite alternate ease-in-out;
+    }
+
+    /* 左上藍青色光暈 */
+    body::before {
+      background: radial-gradient(circle, #0284c7, #38bdf8);
+      top: -100px;
+      left: -100px;
+    }
+
+    /* 右下紫色微光 */
+    body::after {
+      background: radial-gradient(circle, #6366f1, #0284c7);
+      bottom: -100px;
+      right: -100px;
+      animation-delay: -5s;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        transform: scale(0.9) translate(0, 0);
+        opacity: 0.35;
+      }
+      50% {
+        transform: scale(1.15) translate(20px, -20px);
+        opacity: 0.55;
+      }
+      100% {
+        transform: scale(0.95) translate(-10px, 15px);
+        opacity: 0.4;
+      }
+    }
+
+    /* 主容器：呼吸邊框光效 */
     .container {
       width: 100%;
       max-width: 850px;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: 20px;
-      padding: 20px;
+      padding: 24px;
       margin: 10px 0;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(56, 189, 248, 0.1);
+      animation: containerBreathing 6s infinite alternate ease-in-out;
+    }
+
+    @keyframes containerBreathing {
+      0% {
+        border-color: rgba(56, 189, 248, 0.2);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 15px rgba(56, 189, 248, 0.08);
+      }
+      100% {
+        border-color: rgba(56, 189, 248, 0.45);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(56, 189, 248, 0.25);
+      }
     }
 
     /* 1. 首頁入口卡片樣式 */
@@ -46,10 +113,11 @@
 
     .select-title {
       text-align: center;
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: #38bdf8;
       margin-bottom: 10px;
+      text-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
     }
 
     .cards-wrapper {
@@ -62,25 +130,46 @@
       .cards-wrapper { grid-template-columns: 1fr 1fr; }
     }
 
+    /* 幣種卡片呼吸邊框與懸停流光 */
     .coin-card {
-      background: rgba(3, 7, 18, 0.7);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: 16px;
-      padding: 30px 20px;
+      padding: 32px 20px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coin-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
     }
 
     .coin-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-6px);
       border-color: #38bdf8;
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
     }
 
-    .coin-icon { font-size: 3rem; margin-bottom: 10px; }
-    .coin-name { font-size: 1.2rem; font-weight: 800; color: #fff; }
-    .coin-desc { font-size: 0.8rem; color: #9ca3af; margin-top: 6px; }
+    .coin-card:hover::before {
+      opacity: 1;
+    }
+
+    .coin-icon { font-size: 3.2rem; margin-bottom: 12px; transition: transform 0.3s; }
+    .coin-card:hover .coin-icon { transform: scale(1.1); }
+    .coin-name { font-size: 1.25rem; font-weight: 800; color: #fff; }
+    .coin-desc { font-size: 0.8rem; color: #9ca3af; margin-top: 8px; line-height: 1.5; }
 
     /* 2. 詳細儀表板頁面 (預設隱藏) */
     .dashboard-screen { display: none; }
@@ -106,7 +195,11 @@
       transition: 0.2s;
     }
 
-    .back-btn:hover { background: #38bdf8; color: #000; }
+    .back-btn:hover {
+      background: #38bdf8;
+      color: #000;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+    }
 
     .widget-section {
       margin-bottom: 20px;
@@ -188,13 +281,13 @@
       </div>
 
       <!-- 1. K線圖 -->
-      <div class="section-title">📈 即時市場 K 線行情</div>
+      <div class="section-title"> 即時市場 K 線行情</div>
       <div class="widget-section" style="height: 320px;">
         <div id="tv_chart_container" style="height:100%;width:100%"></div>
       </div>
 
       <!-- 2. 多空指針 Widget -->
-      <div class="section-title">⏱️ 技術指標與多空指針</div>
+      <div class="section-title"> 技術指標與多空指針</div>
       <div class="widget-section" id="gauge-container">
         <!-- 動態插入指針語法 -->
       </div>
@@ -208,7 +301,7 @@
       </div>
 
       <!-- 3. AI 消息面報告 -->
-      <div class="section-title">🤖 Gemini AI 消息與技術面綜合報告</div>
+      <div class="section-title"> Gemini AI 消息與技術面綜合報告</div>
       <div id="summary" class="report-box">資料載入中...</div>
       <div id="time" class="footer"></div>
 
@@ -250,7 +343,7 @@
 
       // 2. 載入多空指針 Widget (動態腳本)
       const gaugeContainer = document.getElementById('gauge-container');
-      gaugeContainer.innerHTML = ''; // 清空舊指針
+      gaugeContainer.innerHTML = ''; 
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
